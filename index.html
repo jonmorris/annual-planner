@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Annual Planner</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Blue — Week (primary) */
+      --blue-bg:     #eff6ff;
+      --blue-border: #bfdbfe;
+      --blue-text:   #1e40af;
+      --blue-label:  #3b82f6;
+      --blue-accent: #2563eb;
+
+      /* Teal — Month (secondary) */
+      --teal-bg:     #f0fdfa;
+      --teal-border: #99f6e4;
+      --teal-text:   #0f766e;
+      --teal-label:  #14b8a6;
+      --teal-accent: #0d9488;
+
+      /* Amber — Sprint (tertiary) */
+      --amber-bg:     #fffbeb;
+      --amber-border: #fde68a;
+      --amber-text:   #92400e;
+      --amber-label:  #d97706;
+      --amber-accent: #b45309;
+
+      /* Purple — Year (quaternary) */
+      --purple-bg:     #f5f3ff;
+      --purple-border: #ddd6fe;
+      --purple-text:   #5b21b6;
+      --purple-label:  #7c3aed;
+      --purple-accent: #6d28d9;
+
+      /* Grays */
+      --gray-50:  #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-900: #111827;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100vh;
+    }
+
+    /* ─── Header ─── */
+    .header {
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: var(--gray-900);
+    }
+
+    .year-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-400);
+      background: var(--gray-100);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .header-actions { display: flex; gap: 8px; }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--gray-200);
+      background: #fff;
+      color: var(--gray-600);
+      transition: all 0.15s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .btn:hover { border-color: var(--gray-400); color: var(--gray-900); }
+    .btn-primary { background: var(--gray-900); color: #fff; border-color: var(--gray-900); }
+    .btn-primary:hover { background: var(--gray-700); border-color: var(--gray-700); color: #fff; }
+
+    /* ─── Layout ─── */
+    .main {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+    }
+
+    /* ═══════════════════════════════════════════
+       WEEKLY VIEW
+    ═══════════════════════════════════════════ */
+    .weekly-view {}
+
+    .week-meta {
+      text-align: center;
+      margin-bottom: 28px;
+      padding: 0 8px;
+    }
+
+    .week-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      color: var(--gray-400);
+      margin-bottom: 6px;
+    }
+
+    .week-dates-display {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--gray-900);
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+
+    .week-context-pills {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .context-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 11px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .pill-teal  { background: var(--teal-bg);  border: 1px solid var(--teal-border);  color: var(--teal-text); }
+    .pill-amber { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber-text); }
+    .pill-now   { background: var(--blue-accent); color: #fff; }
+
+    /* Goal Cards */
+    .goal-cards { display: flex; flex-direction: column; gap: 10px; }
+
+    .goal-card {
+      border-radius: 12px;
+      padding: 20px 22px;
+      cursor: pointer;
+      transition: filter 0.12s;
+      position: relative;
+      user-select: none;
+    }
+
+    .goal-card:hover { filter: brightness(0.965); }
+    .goal-card.is-editing { cursor: default; filter: none; }
+
+    .gc-blue  { background: var(--blue-bg);  border: 1px solid var(--blue-border); }
+    .gc-teal  { background: var(--teal-bg);  border: 1px solid var(--teal-border); }
+    .gc-amber  { background: var(--amber-bg);  border: 1px solid var(--amber-border); }
+    .gc-purple { background: var(--purple-bg); border: 1px solid var(--purple-border); }
+
+    .goal-card-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      margin-bottom: 7px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .gc-blue  .goal-card-label { color: var(--blue-label); }
+    .gc-teal  .goal-card-label { color: var(--teal-label); }
+    .gc-amber  .goal-card-label { color: var(--amber-label); }
+    .gc-purple .goal-card-label { color: var(--purple-label); }
+
+    .label-context {
+      font-weight: 500;
+      opacity: 0.7;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 11px;
+    }
+
+    .goal-card-text {
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .gc-teal  .goal-card-text { font-size: 15px; font-weight: 500; }
+    .gc-amber  .goal-card-text { font-size: 14px; font-weight: 500; }
+    .gc-purple .goal-card-text { font-size: 13px; font-weight: 500; }
+
+    .gc-blue   .goal-card-text { color: var(--blue-text); }
+    .gc-teal   .goal-card-text { color: var(--teal-text); }
+    .gc-amber  .goal-card-text { color: var(--amber-text); }
+    .gc-purple .goal-card-text { color: var(--purple-text); }
+
+    .goal-placeholder {
+      font-style: italic;
+      font-weight: 400;
+      opacity: 0.4;
+      font-size: 14px;
+    }
+
+    .goal-textarea {
+      width: 100%;
+      background: none;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      line-height: 1.5;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .gc-blue  .goal-textarea { font-size: 17px; font-weight: 600; color: var(--blue-text); }
+    .gc-teal  .goal-textarea { font-size: 15px; font-weight: 500; color: var(--teal-text); }
+    .gc-amber  .goal-textarea { font-size: 14px; font-weight: 500; color: var(--amber-text); }
+    .gc-purple .goal-textarea { font-size: 13px; font-weight: 500; color: var(--purple-text); }
+
+    .edit-hint {
+      font-size: 11px;
+      opacity: 0.5;
+      margin-top: 8px;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    /* Navigation */
+    .week-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--gray-200);
+      background: #fff;
+      color: var(--gray-600);
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--gray-400); color: var(--gray-900); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .nav-center {
+      text-align: center;
+      font-size: 12px;
+      color: var(--gray-400);
+      line-height: 1.6;
+    }
+
+    .today-link {
+      color: var(--blue-accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .today-link:hover { text-decoration: underline; }
+
+    /* ═══════════════════════════════════════════
+       PLANNING VIEW
+    ═══════════════════════════════════════════ */
+    .planning-view {}
+
+    .planning-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .planning-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+
+    /* Sprint group header */
+    .sprint-group { margin-bottom: 6px; }
+
+    .sprint-group-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 24px 0 10px;
+    }
+
+    .sprint-group-header:first-child { margin-top: 0; }
+
+    .sprint-group-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--amber-text);
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .sprint-group-line {
+      flex: 1;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    /* Planning card */
+    .planning-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      transition: box-shadow 0.15s;
+    }
+
+    .planning-card:hover { box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+
+    .planning-card.is-current {
+      border-color: var(--blue-accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.07);
+    }
+
+    .planning-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .planning-card-week {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-700);
+    }
+
+    .planning-card-range {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--gray-400);
+    }
+
+    .planning-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .now-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: var(--blue-accent);
+      color: #fff;
+      padding: 2px 7px;
+      border-radius: 8px;
+    }
+
+    .view-week-btn {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--blue-accent);
+      background: var(--blue-bg);
+      border: 1px solid var(--blue-border);
+      padding: 3px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.12s;
+    }
+    .view-week-btn:hover { background: var(--blue-border); }
+
+    /* Goal rows in planning card */
+    .planning-goal-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 7px 0;
+      border-top: 1px solid var(--gray-100);
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .planning-goal-row:hover .planning-goal-text { color: var(--gray-900); }
+
+    .planning-goal-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .tag-blue  { background: var(--blue-bg);  color: var(--blue-label);  }
+    .tag-teal  { background: var(--teal-bg);  color: var(--teal-label);  }
+    .tag-amber  { background: var(--amber-bg);  color: var(--amber-label); }
+    .tag-purple { background: var(--purple-bg); color: var(--purple-label); }
+
+    .planning-goal-text {
+      font-size: 13px;
+      color: var(--gray-600);
+      line-height: 1.5;
+      flex: 1;
+      transition: color 0.1s;
+    }
+
+    .planning-goal-empty {
+      color: var(--gray-300);
+      font-style: italic;
+    }
+
+    .planning-goal-textarea {
+      flex: 1;
+      border: 1px solid var(--blue-border);
+      border-radius: 5px;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--gray-700);
+      line-height: 1.5;
+      background: var(--blue-bg);
+      padding: 5px 8px;
+      min-height: 54px;
+      transition: border-color 0.15s;
+    }
+    .planning-goal-textarea:focus { border-color: var(--blue-accent); }
+
+    /* Notes */
+    .planning-notes {
+      padding-top: 8px;
+      border-top: 1px solid var(--gray-100);
+      margin-top: 2px;
+    }
+
+    .planning-notes-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--gray-300);
+      margin-bottom: 5px;
+    }
+
+    .planning-notes-ta {
+      width: 100%;
+      background: none;
+      border: 1px solid transparent;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--gray-500);
+      line-height: 1.5;
+      padding: 0;
+      min-height: 28px;
+      transition: all 0.15s;
+      border-radius: 5px;
+    }
+
+    .planning-notes-ta:focus {
+      background: var(--gray-50);
+      border-color: var(--gray-200);
+      padding: 6px 8px;
+    }
+
+    .planning-notes-ta::placeholder {
+      color: var(--gray-300);
+      font-style: italic;
+    }
+
+    /* ─── Responsive ─── */
+    @media (min-width: 600px) {
+      .week-dates-display { font-size: 38px; }
+      .goal-card { padding: 24px 26px; }
+      .main { padding: 36px 24px 72px; }
+      .gc-blue .goal-card-text { font-size: 19px; }
+      .gc-teal .goal-card-text { font-size: 16px; }
+    }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+
+    /* ─── Transition ─── */
+    .fade-in { animation: fadeIn 0.18s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="app-title">Annual Planner</span>
+      <span class="year-badge" id="year-badge"></span>
+    </div>
+    <div class="header-actions">
+      <button class="btn" onclick="exportData()" title="Export data as JSON">Export</button>
+      <button class="btn" onclick="document.getElementById('import-file').click()" title="Import JSON">Import</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none" onchange="importData(event)">
+      <button class="btn" id="today-btn" onclick="goToToday()" title="Jump to current week">Today</button>
+      <button class="btn btn-primary" id="mode-btn" onclick="toggleMode()">Planning View</button>
+    </div>
+  </header>
+
+  <main class="main" id="app"></main>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════
+const YEAR = new Date().getFullYear();
+const MONTHS      = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_S    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const SPRINT_NAMES = ['Jan – Feb','Mar – Apr','May – Jun','Jul – Aug','Sep – Oct','Nov – Dec'];
+
+// ═══════════════════════════════════════════════
+//  WEEK GENERATION
+// ═══════════════════════════════════════════════
+function generateWeeks(year) {
+  const weeks = [];
+  const jan1 = new Date(year, 0, 1);
+
+  // Sunday on or before Jan 1
+  const dow = jan1.getDay(); // 0=Sun
+  const daysBack = dow; // 0 if already Sunday, otherwise days since last Sunday
+  const cur = new Date(jan1);
+  cur.setDate(cur.getDate() - daysBack);
+
+  let weekNum = 1;
+
+  while (weekNum <= 54) {
+    const end = new Date(cur);
+    end.setDate(cur.getDate() + 6);
+
+    if (cur.getFullYear() > year) break;
+
+    const startMonth = cur.getMonth(); // 0-indexed
+    const sprintIdx  = Math.floor(startMonth / 2); // 0–5
+
+    weeks.push({
+      id:         `${year}-w${weekNum}`,
+      weekNum,
+      startDate:  new Date(cur),
+      endDate:    new Date(end),
+      startMonth,
+      endMonth:   end.getMonth(),
+      monthId:    `${year}-m${startMonth}`,
+      monthName:  MONTHS[startMonth],
+      monthShort: MONTHS_S[startMonth],
+      sprintIdx,
+      sprintId:   `${year}-s${sprintIdx}`,
+      sprintName: SPRINT_NAMES[sprintIdx],
+      sprintNum:  sprintIdx + 1,
+    });
+
+    weekNum++;
+    cur.setDate(cur.getDate() + 7);
+  }
+
+  return weeks;
+}
+
+const WEEKS = generateWeeks(YEAR);
+
+function findCurrentWeekIndex() {
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  const idx = WEEKS.findIndex(w => {
+    const s = new Date(w.startDate); s.setHours(0, 0, 0, 0);
+    const e = new Date(w.endDate);   e.setHours(23, 59, 59, 0);
+    return today >= s && today <= e;
+  });
+  return idx >= 0 ? idx : 0;
+}
+
+const CURRENT_WEEK_IDX = findCurrentWeekIndex();
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const state = {
+  mode:      'weekly',   // 'weekly' | 'planning'
+  weekIndex: CURRENT_WEEK_IDX,
+  editing:   null,       // { type: 'week'|'month'|'sprint'|'notes', id } | null
+  data: {
+    weekGoals:   {},
+    monthGoals:  {},
+    sprintGoals: {},
+    yearGoal:    '',
+    notes:       {},
+  },
+};
+
+// ═══════════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════════
+function loadData() {
+  try {
+    const raw = localStorage.getItem(`annual-planner-${YEAR}-v1`);
+    if (raw) { const d = JSON.parse(raw); Object.assign(state.data, d); }
+  } catch(_) {}
+}
+
+function saveData() {
+  try { localStorage.setItem(`annual-planner-${YEAR}-v1`, JSON.stringify(state.data)); } catch(_) {}
+}
+
+function exportData() {
+  // Export ALL years' data, not just current year
+  const out = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('annual-planner-')) out[k] = localStorage.getItem(k);
+  }
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'annual-planner-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const keys = Object.keys(data).filter(k => k.startsWith('annual-planner-'));
+      if (keys.length === 0) throw new Error('no annual-planner keys found');
+      if (!confirm('Import data for ' + keys.length + ' year(s)? This will replace existing data.')) return;
+      keys.forEach(k => localStorage.setItem(k, data[k]));
+      loadData();
+      render(false);
+      alert('Imported successfully.');
+    } catch(err) {
+      alert('Could not import: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function wg(id)  { return state.data.weekGoals[id]   || ''; }
+function mg(id)  { return state.data.monthGoals[id]  || ''; }
+function sg(id)  { return state.data.sprintGoals[id] || ''; }
+function yg()    { return state.data.yearGoal         || ''; }
+function ntg(id) { return state.data.notes[id]       || ''; }
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+function render(restoreScroll) {
+  const scrollY = restoreScroll ? window.scrollY : 0;
+  document.getElementById('year-badge').textContent = YEAR;
+  document.getElementById('mode-btn').textContent =
+    state.mode === 'weekly' ? 'Planning View' : 'Weekly View';
+  document.getElementById('today-btn').style.display =
+    (state.mode === 'weekly' && state.weekIndex === CURRENT_WEEK_IDX) ? 'none' : '';
+
+  const app = document.getElementById('app');
+  app.innerHTML = state.mode === 'weekly' ? renderWeekly() : renderPlanning();
+  app.classList.add('fade-in');
+  setTimeout(() => app.classList.remove('fade-in'), 200);
+
+  if (restoreScroll) {
+    requestAnimationFrame(() => window.scrollTo(0, scrollY));
+  } else if (state.mode === 'planning') {
+    setTimeout(() => {
+      const el = document.getElementById(`pcard-${CURRENT_WEEK_IDX}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+  }
+}
+
+// ─── WEEKLY VIEW ────────────────────────────────
+function renderWeekly() {
+  const w   = WEEKS[state.weekIndex];
+  const now = state.weekIndex === CURRENT_WEEK_IDX;
+  const prev = WEEKS[state.weekIndex - 1];
+  const next = WEEKS[state.weekIndex + 1];
+
+  const weekGoal  = wg(w.id);
+  const monthGoal = mg(w.monthId);
+  const sprintGoal= sg(w.sprintId);
+
+  const eW = state.editing?.type === 'week'   && state.editing.id === w.id;
+  const eM = state.editing?.type === 'month'  && state.editing.id === w.monthId;
+  const eS = state.editing?.type === 'sprint' && state.editing.id === w.sprintId;
+  const eY = state.editing?.type === 'year'   && state.editing.id === `${YEAR}`;
+
+  const dateRange = `${fmtDate(w.startDate)} – ${fmtDate(w.endDate)}`;
+
+  return `
+    <div class="weekly-view">
+
+      <div class="week-meta">
+        <div class="week-eyebrow">Week ${w.weekNum} &middot; ${YEAR}</div>
+        <div class="week-dates-display">${dateRange}</div>
+        <div class="week-context-pills">
+          <span class="context-pill pill-teal">${w.monthName}</span>
+          <span class="context-pill pill-amber">Sprint ${w.sprintNum} &middot; ${w.sprintName}</span>
+          ${now ? '<span class="context-pill pill-now">Current Week</span>' : ''}
+        </div>
+      </div>
+
+      <div class="goal-cards">
+
+        <!-- Week Goal -->
+        <div class="goal-card gc-blue ${eW ? 'is-editing' : ''}"
+          onclick="${eW ? '' : `startEdit('week','${w.id}',true)`}">
+          <div class="goal-card-label">
+            This Week
+            ${eW ? '<span class="edit-hint">Esc to cancel · ⌘↵ to save</span>' : ''}
+          </div>
+          ${eW
+            ? `<textarea class="goal-textarea" id="edit-ta" rows="3"
+                onblur="commitEdit(this.value,'week','${w.id}',true)"
+                onkeydown="onEditKey(event,this,'week','${w.id}',true)"
+                onclick="event.stopPropagation()">${esc(weekGoal)}</textarea>`
+            : `<div class="goal-card-text ${weekGoal ? '' : 'goal-placeholder'}">${weekGoal ? esc(weekGoal) : 'Click to set your focus for this week…'}</div>`
+          }
+        </div>
+
+        <!-- Month Goal -->
+        <div class="goal-card gc-teal ${eM ? 'is-editing' : ''}"
+          onclick="${eM ? '' : `startEdit('month','${w.monthId}',true)`}">
+          <div class="goal-card-label">
+            This Month
+            <span class="label-context">&middot; ${w.monthName}</span>
+            ${eM ? '<span class="edit-hint">Esc · ⌘↵</span>' : ''}
+          </div>
+          ${eM
+            ? `<textarea class="goal-textarea" id="edit-ta" rows="2"
+                onblur="commitEdit(this.value,'month','${w.monthId}',true)"
+                onkeydown="onEditKey(event,this,'month','${w.monthId}',true)"
+                onclick="event.stopPropagation()">${esc(monthGoal)}</textarea>`
+            : `<div class="goal-card-text ${monthGoal ? '' : 'goal-placeholder'}">${monthGoal ? esc(monthGoal) : `Set your ${w.monthName} goal…`}</div>`
+          }
+        </div>
+
+        <!-- Sprint Goal -->
+        <div class="goal-card gc-amber ${eS ? 'is-editing' : ''}"
+          onclick="${eS ? '' : `startEdit('sprint','${w.sprintId}',true)`}">
+          <div class="goal-card-label">
+            This Sprint
+            <span class="label-context">&middot; ${w.sprintName}</span>
+            ${eS ? '<span class="edit-hint">Esc · ⌘↵</span>' : ''}
+          </div>
+          ${eS
+            ? `<textarea class="goal-textarea" id="edit-ta" rows="2"
+                onblur="commitEdit(this.value,'sprint','${w.sprintId}',true)"
+                onkeydown="onEditKey(event,this,'sprint','${w.sprintId}',true)"
+                onclick="event.stopPropagation()">${esc(sprintGoal)}</textarea>`
+            : `<div class="goal-card-text ${sprintGoal ? '' : 'goal-placeholder'}">${sprintGoal ? esc(sprintGoal) : `Set your Sprint ${w.sprintNum} goal…`}</div>`
+          }
+        </div>
+
+        <!-- Year Goal -->
+        <div class="goal-card gc-purple ${eY ? 'is-editing' : ''}"
+          onclick="${eY ? '' : `startEdit('year','${YEAR}',true)`}">
+          <div class="goal-card-label">
+            This Year
+            <span class="label-context">&middot; ${YEAR}</span>
+            ${eY ? '<span class="edit-hint">Esc · ⌘↵</span>' : ''}
+          </div>
+          ${eY
+            ? `<textarea class="goal-textarea" id="edit-ta" rows="2"
+                onblur="commitEdit(this.value,'year','${YEAR}',true)"
+                onkeydown="onEditKey(event,this,'year','${YEAR}',true)"
+                onclick="event.stopPropagation()">${esc(yg())}</textarea>`
+            : `<div class="goal-card-text ${yg() ? '' : 'goal-placeholder'}">${yg() ? esc(yg()) : `Set your ${YEAR} goal…`}</div>`
+          }
+        </div>
+
+      </div>
+
+      <!-- Navigation -->
+      <div class="week-nav">
+        <button class="nav-btn" onclick="navWeek(-1)" ${state.weekIndex === 0 ? 'disabled' : ''}>
+          ← ${prev ? `Wk ${prev.weekNum}` : ''}
+        </button>
+        <div class="nav-center">
+          ${state.weekIndex + 1} of ${WEEKS.length}
+          ${!now ? `<br><a class="today-link" href="#" onclick="goToToday();return false">↩ Today</a>` : ''}
+        </div>
+        <button class="nav-btn" onclick="navWeek(1)" ${state.weekIndex === WEEKS.length - 1 ? 'disabled' : ''}>
+          ${next ? `Wk ${next.weekNum}` : ''} →
+        </button>
+      </div>
+
+    </div>
+  `;
+}
+
+// ─── PLANNING VIEW ───────────────────────────────
+function renderPlanning() {
+  // Group weeks by sprint
+  const sprintGroups = [];
+  let currentSprint = -1;
+
+  WEEKS.forEach((w, idx) => {
+    if (w.sprintIdx !== currentSprint) {
+      currentSprint = w.sprintIdx;
+      sprintGroups.push({ sprintIdx: w.sprintIdx, sprintName: w.sprintName, sprintNum: w.sprintNum, weeks: [] });
+    }
+    sprintGroups[sprintGroups.length - 1].weeks.push({ w, idx });
+  });
+
+  const cards = sprintGroups.map(g => `
+    <div class="sprint-group">
+      <div class="sprint-group-header">
+        <span class="sprint-group-label">Sprint ${g.sprintNum} &middot; ${g.sprintName}</span>
+        <span class="sprint-group-line"></span>
+      </div>
+      ${g.weeks.map(({ w, idx }) => renderPlanningCard(w, idx)).join('')}
+    </div>
+  `).join('');
+
+  return `<div class="planning-view">${cards}</div>`;
+}
+
+function renderPlanningCard(w, idx) {
+  const isCurrent = idx === CURRENT_WEEK_IDX;
+  const weekGoal   = wg(w.id);
+  const monthGoal  = mg(w.monthId);
+  const sprintGoal = sg(w.sprintId);
+  const notes      = ntg(w.id);
+
+  const eW = state.editing?.type === 'week'   && state.editing.id === w.id;
+  const eM = state.editing?.type === 'month'  && state.editing.id === w.monthId;
+  const eS = state.editing?.type === 'sprint' && state.editing.id === w.sprintId;
+  const eY = state.editing?.type === 'year'   && state.editing.id === `${YEAR}`;
+
+  const dateRange = `${fmtDate(w.startDate)} – ${fmtDate(w.endDate)}`;
+
+  return `
+    <div class="planning-card ${isCurrent ? 'is-current' : ''}" id="pcard-${idx}">
+      <div class="planning-card-header">
+        <div>
+          <span class="planning-card-week">Week ${w.weekNum}</span>
+          <span class="planning-card-range"> &middot; ${dateRange}</span>
+        </div>
+        <div class="planning-card-actions">
+          ${isCurrent ? '<span class="now-badge">Now</span>' : ''}
+          <button class="view-week-btn" onclick="viewWeek(${idx})">View →</button>
+        </div>
+      </div>
+
+      <!-- Week -->
+      <div class="planning-goal-row" onclick="${eW ? '' : `startEdit('week','${w.id}',false)`}">
+        <span class="planning-goal-tag tag-blue">Week</span>
+        ${eW
+          ? `<textarea class="planning-goal-textarea" id="edit-ta"
+              onblur="commitEdit(this.value,'week','${w.id}',false)"
+              onkeydown="onEditKey(event,this,'week','${w.id}',false)"
+              onclick="event.stopPropagation()">${esc(weekGoal)}</textarea>`
+          : `<span class="planning-goal-text ${weekGoal ? '' : 'planning-goal-empty'}">${weekGoal ? esc(weekGoal) : 'Add week goal…'}</span>`
+        }
+      </div>
+
+      <!-- Month -->
+      <div class="planning-goal-row" onclick="${eM ? '' : `startEdit('month','${w.monthId}',false)`}">
+        <span class="planning-goal-tag tag-teal">Month <span style="font-weight:500;opacity:0.7">&middot; ${w.monthShort}</span></span>
+        ${eM
+          ? `<textarea class="planning-goal-textarea" id="edit-ta"
+              onblur="commitEdit(this.value,'month','${w.monthId}',false)"
+              onkeydown="onEditKey(event,this,'month','${w.monthId}',false)"
+              onclick="event.stopPropagation()">${esc(monthGoal)}</textarea>`
+          : `<span class="planning-goal-text ${monthGoal ? '' : 'planning-goal-empty'}">${monthGoal ? esc(monthGoal) : `${w.monthName} goal…`}</span>`
+        }
+      </div>
+
+      <!-- Sprint -->
+      <div class="planning-goal-row" onclick="${eS ? '' : `startEdit('sprint','${w.sprintId}',false)`}">
+        <span class="planning-goal-tag tag-amber">Sprint</span>
+        ${eS
+          ? `<textarea class="planning-goal-textarea" id="edit-ta"
+              onblur="commitEdit(this.value,'sprint','${w.sprintId}',false)"
+              onkeydown="onEditKey(event,this,'sprint','${w.sprintId}',false)"
+              onclick="event.stopPropagation()">${esc(sprintGoal)}</textarea>`
+          : `<span class="planning-goal-text ${sprintGoal ? '' : 'planning-goal-empty'}">${sprintGoal ? esc(sprintGoal) : `Sprint ${w.sprintNum} goal…`}</span>`
+        }
+      </div>
+
+      <!-- Year -->
+      <div class="planning-goal-row" onclick="${eY ? '' : `startEdit('year','${YEAR}',false)`}">
+        <span class="planning-goal-tag tag-purple">Year</span>
+        ${eY
+          ? `<textarea class="planning-goal-textarea" id="edit-ta"
+              onblur="commitEdit(this.value,'year','${YEAR}',false)"
+              onkeydown="onEditKey(event,this,'year','${YEAR}',false)"
+              onclick="event.stopPropagation()">${esc(yg())}</textarea>`
+          : `<span class="planning-goal-text ${yg() ? '' : 'planning-goal-empty'}">${yg() ? esc(yg()) : `${YEAR} goal…`}</span>`
+        }
+      </div>
+
+      <!-- Notes -->
+      <div class="planning-notes">
+        <div class="planning-notes-label">Notes</div>
+        <textarea class="planning-notes-ta" placeholder="Freeform notes for this week…" rows="2"
+          oninput="state.data.notes['${w.id}']=this.value"
+          onblur="saveData()">${esc(notes)}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════
+//  EDITING
+// ═══════════════════════════════════════════════
+function startEdit(type, id, isWeeklyMode) {
+  if (state.editing?.type === type && state.editing.id === id) return;
+  state.editing = { type, id };
+  render(true);
+  setTimeout(() => {
+    const ta = document.getElementById('edit-ta');
+    if (ta) { ta.focus(); const l = ta.value.length; ta.setSelectionRange(l, l); autoResize(ta); }
+  }, 0);
+}
+
+function commitEdit(value, type, id, isWeeklyMode) {
+  const trimmed = value.trim();
+  if (type === 'week')   state.data.weekGoals[id]   = trimmed;
+  if (type === 'month')  state.data.monthGoals[id]  = trimmed;
+  if (type === 'sprint') state.data.sprintGoals[id] = trimmed;
+  if (type === 'year')   state.data.yearGoal        = trimmed;
+  state.editing = null;
+  saveData();
+  render(true);
+}
+
+function onEditKey(e, el, type, id, isWeeklyMode) {
+  autoResize(el);
+  if (e.key === 'Escape') { e.preventDefault(); state.editing = null; render(true); return; }
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); commitEdit(el.value, type, id, isWeeklyMode); }
+}
+
+function autoResize(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
+
+// ═══════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════
+function navWeek(dir) {
+  const next = state.weekIndex + dir;
+  if (next < 0 || next >= WEEKS.length) return;
+  state.weekIndex = next;
+  state.editing = null;
+  render(false);
+}
+
+function goToToday() {
+  state.weekIndex = CURRENT_WEEK_IDX;
+  state.editing = null;
+  if (state.mode !== 'weekly') {
+    state.mode = 'weekly';
+  }
+  render(false);
+}
+
+function viewWeek(idx) {
+  state.weekIndex = idx;
+  state.mode = 'weekly';
+  state.editing = null;
+  render(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleMode() {
+  state.mode = state.mode === 'weekly' ? 'planning' : 'weekly';
+  state.editing = null;
+  render(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════
+//  KEYBOARD & SWIPE
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (state.mode !== 'weekly' || state.editing) return;
+  if (e.key === 'ArrowLeft'  && !e.metaKey) navWeek(-1);
+  if (e.key === 'ArrowRight' && !e.metaKey) navWeek(1);
+});
+
+let touchX = 0;
+document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', e => {
+  if (state.mode !== 'weekly' || state.editing) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 55) navWeek(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+loadData();
+render(false);
+</script>
+</body>
+</html>
