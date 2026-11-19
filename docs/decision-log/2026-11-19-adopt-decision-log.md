@@ -1,0 +1,1 @@
+| 2026-11-19 | Process | Decisions are recorded as one-row files in `docs/decision-log/`, folded into this log on main, and a modular case study is kept beside it | DECISIONS.md → Running decision log and case study |
